@@ -57,7 +57,7 @@ class Rossmann( object ):
 
         #promo_interval
         month_map = {1: 'Jan', 2: 'Fev', 3: 'Mar', 4: 'Apr', 5: 'May', 6: 'Jun', 7: 'Jul', 8: 'Aug', 9: 'Sep', 10: 'Oct', 11: 'Nov', 12: 'Dec'}
-        df1['promo_interval'].fillna(0, inplace=True )
+        df1['promo_interval'] = df1['promo_interval'].fillna(0)
         df1['month_map'] = df1['date'].dt.month.map( month_map )
         df1['is_promo'] = df1[['promo_interval', 'month_map']].apply( lambda x: 0 
         if x['promo_interval'] == 0 else 1 if x['month_map'] in x['promo_interval'].split( ',' ) else 0, axis=1 )
