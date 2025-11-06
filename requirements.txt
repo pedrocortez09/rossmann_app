@@ -2,6 +2,7 @@ Flask==3.0.3
 gunicorn==21.2.0
 pandas==2.2.2
 numpy==1.26.4
+inflection==0.5.1
 xgboost==2.0.3
 scikit-learn==1.4.2
 scipy==1.13.1
