@@ -136,9 +136,12 @@ class Rossmann( object ):
         df5['day_of_week_sin'] = np.sin(df5['day_of_week'] * (2 * np.pi / 7))
         df5['day_of_week_cos'] = np.cos(df5['day_of_week'] * (2 * np.pi / 7))
 
+        return df5
+
     
     
     def get_prediction(self, model, original_data, test_data):
+        
         # Lista de colunas usadas no treinamento
         cols_selected = [
             'store_te',
