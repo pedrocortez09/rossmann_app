@@ -136,7 +136,10 @@ class Rossmann( object ):
         df5['day_of_week_sin'] = np.sin(df5['day_of_week'] * (2 * np.pi / 7))
         df5['day_of_week_cos'] = np.cos(df5['day_of_week'] * (2 * np.pi / 7))
 
-        # Seleção final
+    
+    
+    def get_prediction(self, model, original_data, test_data):
+        # Lista de colunas usadas no treinamento
         cols_selected = [
             'store_te',
             'promo',
@@ -149,15 +152,14 @@ class Rossmann( object ):
             'day_of_week_sin'
         ]
 
-        return df5[cols_selected]
-    
-    
-    def get_prediction( self, model, original_data, test_data ):
-        
-        # prediction
-        pred = model.predict( test_data )
-        
-        # join pred into the original data
-        original_data['prediction'] = np.expm1( pred )
-        
-        return original_data.to_json( orient='records', date_format='iso' )
+        # Garante que test_data é um DataFrame com colunas na mesma ordem do treino
+        X = pd.DataFrame(test_data, columns=cols_selected)
+
+        # Faz a previsão
+        pred = model.predict(X)
+
+        # Reverte log-transform, se o modelo foi treinado com np.log1p()
+        original_data['prediction'] = np.expm1(pred)
+
+        # Retorna JSON formatado
+        return original_data.to_json(orient='records', date_format='iso')
