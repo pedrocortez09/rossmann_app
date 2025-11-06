@@ -124,9 +124,9 @@ class Rossmann( object ):
         df5['store_te'] = df5['store'].map(self.store_te_mapping).fillna(self.store_te_global_mean)
         
         # Rescaling apenas do que foi usado
-        df5['competition_distance'] = self.competition_distance_scaler.transform(df5[['competition_distance']].values)
-        df5['competition_time_month'] = self.competition_time_month_scaler.transform(df5[['competition_time_month']].values)
-        df5['promo_time_week'] = self.promo_time_week_scaler.transform(df5[['promo_time_week']].values)
+        df5['competition_distance'] = self.competition_distance_scaler.transform(df5[['competition_distance']])
+        df5['competition_time_month'] = self.competition_time_month_scaler.transform(df5[['competition_time_month']])
+        df5['promo_time_week'] = self.promo_time_week_scaler.transform(df5[['promo_time_week']])
 
         # Ordinal encoding do assortment
         assortment_dict = {'basic': 1, 'extra': 2, 'extended': 3}
@@ -136,13 +136,7 @@ class Rossmann( object ):
         df5['day_of_week_sin'] = np.sin(df5['day_of_week'] * (2 * np.pi / 7))
         df5['day_of_week_cos'] = np.cos(df5['day_of_week'] * (2 * np.pi / 7))
 
-        return df5
-
-    
-    
-    def get_prediction(self, model, original_data, test_data):
-        
-        # Lista de colunas usadas no treinamento
+        # Seleção final
         cols_selected = [
             'store_te',
             'promo',
@@ -155,14 +149,16 @@ class Rossmann( object ):
             'day_of_week_sin'
         ]
 
-        # Garante que test_data é um DataFrame com colunas na mesma ordem do treino
-        X = pd.DataFrame(test_data, columns=cols_selected)
+        return df5[cols_selected]
 
-        # Faz a previsão
-        pred = model.predict(X)
+    
+    
+    def get_prediction(self, model, original_data, test_data):
 
-        # Reverte log-transform, se o modelo foi treinado com np.log1p()
-        original_data['prediction'] = np.expm1(pred)
-
-        # Retorna JSON formatado
-        return original_data.to_json(orient='records', date_format='iso')
+        # prediction
+        pred = model.predict( test_data )
+        
+        # join pred into the original data
+        original_data['prediction'] = np.expm1( pred )
+        
+        return original_data.to_json( orient='records', date_format='iso' )
